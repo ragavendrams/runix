@@ -1,4 +1,4 @@
-## Linux container in C
+## Linux container runtime in C
 
 This repository implements a linux container runtime from scratch in C. It uses a combination of Linux features such as chroot, cgroups(v1) and namespaces. The corresponding syscalls/wrappers are called from C. The container runtime has the following features:
 - Bidirectional process isolation with host
