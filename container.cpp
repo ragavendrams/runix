@@ -68,8 +68,10 @@ void set_cgroup() {
 
   sprintf(path, "%s/%s/%s", base_path, resource_folder, cgroup_name);
   if (mkdir(path, 0755) == -1) {
-    perror("mkdir failed");
-    exit(1);
+    if (errno != EEXIST) {
+      perror("mkdir failed");
+      exit(1);
+    }
   }
 
   write_resource(path, "pids.max", "20");
