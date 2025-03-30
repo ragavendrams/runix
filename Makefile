@@ -1,10 +1,11 @@
-.SILENT: runix main.o args.o clean
-
 CC := gcc
 CCARGS := -O3
+CCOBJECTS := main.o args.o container.o
 
-runix: main.o args.o
-	${CC} ${CCARGS} main.o args.o -o runix
+.SILENT: runix ${CCOBJECTS} clean 
+
+runix: ${CCOBJECTS}
+	${CC} ${CCARGS} ${CCOBJECTS} -o runix
 
 main.o: main.c
 	${CC} ${CCARGS} -c main.c
@@ -12,8 +13,11 @@ main.o: main.c
 argc.o: args.c argc.h
 	${CC} ${CCARGS} -c args.c
 
+container.o: container.c container.h
+	${CC} ${CCARGS} -c container.c
+ 
 run: runix
 	./runix run "/bin/bash"
 
 clean:
-	rm -rf runix args.o main.o
+	rm -rf runix ${CCOBJECTS}
