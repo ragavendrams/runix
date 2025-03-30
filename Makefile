@@ -1,19 +1,19 @@
-.SILENT: linux-container container.o command_parser.o clean
+.SILENT: runix main.o args.o clean
 
-CC := g++
-CCARGS := --std=c++17 -O3
+CC := gcc
+CCARGS := -O3
 
-linux-container: container.o command_parser.o
-	${CC} ${CCARGS} container.o command_parser.o -o linux-container
+runix: main.o args.o
+	${CC} ${CCARGS} main.o args.o -o runix
 
-container.o: container.cpp command_parser.h
-	${CC} ${CCARGS} -c container.cpp
+main.o: main.c
+	${CC} ${CCARGS} -c main.c
 
-command_parser.o: command_parser.cpp command_parser.h
-	${CC} ${CCARGS} -c command_parser.cpp
+argc.o: args.c argc.h
+	${CC} ${CCARGS} -c args.c
 
-run: linux-container
-	./linux-container run "/bin/bash"
+run: runix
+	./runix run "/bin/bash"
 
 clean:
-	rm -rf command_parser.o container.o linux-container
+	rm -rf runix args.o main.o
