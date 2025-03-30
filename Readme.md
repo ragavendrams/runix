@@ -30,21 +30,22 @@ This repository implements a linux container runtime from scratch in C. It uses 
 
 - Build the application and run it (ensure to run in a prompt with elevated privileges)
 ``` 
-	# Builds the application
+	# Build the application
 	make 
 	
-	# Start a bash shell (needs to be available in the rootfs)
-	make run
+	# Start a bash shell (The shell needs to be available in the rootfs)
+	./runix run "/bin/bash"
 
-	# OR Run a different shell e.g /bin/ash shell for alpine
-	./runix run "/bin/ash" 
+	# Install packages
+	./runix run "apt install wget"
+ 
 ``` 
 - If everything goes well, you should see a shell with the prompt `root@container:/#`
 
 - Type exit to end the process and return to host.  
 
 ## Limitations
-- Doesn't support pulling an image from docker-hub or other registries and running the container on it. For now, the rootfs has to be provided to the application. 
+- Doesn't support pulling an image from docker-hub or other registries and starting the container using it. For now, the rootfs has to be provided to the application. 
 - No layers, caching and use of union filesystem, like in docker.
-- No way to load or save the container. Right now, if you reuse the same rootfs folder, it kind of works like a load. Ideally, you get a new rootfs every time a new container is created. 
-- Only a few resources can be limited - Currently supports limiting max processes.  
+- No way to load or save the container. Right now, if you reuse the same rootfs folder, the state of the container is persistent. Ideally, you get a new filesystem every time a new container is created. 
+- Only a few resources are limited - Currently supports limiting max processes.  
