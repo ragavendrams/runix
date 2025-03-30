@@ -17,14 +17,13 @@ This repository implements a linux container runtime from scratch in C. It uses 
 ``` 
 	git clone https://github.com/ragavendrams/linux-container-from-scratch.git
 ``` 
-- Install Make and GCC/G++
+- Install Make and GCC
 ``` 
 	sudo apt update && sudo apt install build-essential
 	
 	# Ensure everything is installed
 	make --version
 	gcc --version
-	g++ --version
 ``` 
 
 ## Running the container
@@ -38,7 +37,7 @@ This repository implements a linux container runtime from scratch in C. It uses 
 	make run
 
 	# OR Run a different shell e.g /bin/ash shell for alpine
-	./linux-container run "/bin/ash" 
+	./runix run "/bin/ash" 
 ``` 
 - If everything goes well, you should see a shell with the prompt `root@container:/#`
 
