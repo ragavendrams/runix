@@ -26,7 +26,7 @@ void write_resource(const char *base_path, const char *resource_name,
 
 	char* full_path = malloc(path_len + 1);
 	sprintf(full_path, "%s/%s", base_path, resource_name);
-	
+
 	FILE *file = fopen(full_path, "w");
 	if (file) {
 		fputs(resource_value, file);
@@ -74,23 +74,23 @@ char** split_string(const char* input, const char* delimiter, int* count) {
 	int num_tokens = 0;
 	char* token = strtok(temp_string, delimiter);
 	while(token != NULL){
-	num_tokens++;
-	token = strtok(NULL, delimiter);
+		num_tokens++;
+		token = strtok(NULL, delimiter);
 	}
 
 	// Allocate memory for the array of tokens
 	char** tokens = malloc(sizeof(char*) * (num_tokens + 1)); 
 	if (!tokens) {
-	perror("Failed to allocate memory");
-	free(temp_string);
-	exit(1);
+		perror("Failed to allocate memory");
+		free(temp_string);
+		exit(1);
 	}
 
 	token = strtok(temp_string, delimiter);
 	int i = 0;
 	while (token != NULL) {
-	tokens[i++] = strdup(token); // Copy each token into the array
-	token = strtok(NULL, delimiter);
+		tokens[i++] = strdup(token); // Copy each token into the array
+		token = strtok(NULL, delimiter);
 	}
 
 	tokens[i] = NULL; 
@@ -133,7 +133,7 @@ void run_container(Arguments* args_ptr) {
 		exit(1);
 	}
 
-	if (chroot("/home/raga/repos/linux-container-from-scratch/ubuntu-fs") == -1) {
+	if (chroot(args_ptr->filesystem_path) == -1) {
 		perror("chroot failed");
 		exit(1);
 	}
