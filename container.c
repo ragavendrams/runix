@@ -11,55 +11,12 @@
 #include <sys/syscall.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "args.h"
 #include <signal.h>
 #include <sched.h>
 #include <stdlib.h>
+#include "cgroups.h"
+#include "arguments.h"
 
-void write_resource(const char *base_path, const char *resource_name,
-	const char *resource_value) {
-
-	int path_len = strlen(resource_name) + strlen(base_path);
-	if(path_len > 256){
-		fprintf(stderr, "Error: Path length of cgroup resource exceeded 256 characters.");
-	}
-
-	char* full_path = malloc(path_len + 1);
-	sprintf(full_path, "%s/%s", base_path, resource_name);
-
-	FILE *file = fopen(full_path, "w");
-	if (file) {
-		fputs(resource_value, file);
-		fclose(file);
-	} else {
-		printf("Unable to write resource to disk.");
-		exit(1);
-	}
-}
-
-void set_cgroup() {
-
-	const char *base_path = "/sys/fs/cgroup";
-	const char *resource_folder = "pids";
-	const char *cgroup_name = "runix";
-	char path[100];
-
-	sprintf(path, "%s/%s/%s", base_path, resource_folder, cgroup_name);
-	if (mkdir(path, 0755) == -1) {
-		if (errno != EEXIST) {
-		perror("mkdir failed");
-		exit(1);
-		}
-	}
-
-	write_resource(path, "pids.max", "20");
-
-	write_resource(path, "notify_on_release", "1");
-
-	char pid_str[10];
-	sprintf(pid_str, "%d", getpid());
-	write_resource(path, "cgroup.procs", pid_str);
-}
 
 char** split_string(const char* input, const char* delimiter, int* count) {
 
@@ -111,7 +68,7 @@ void free_tokens(char** tokens, int num_tokens){
 
 void run_container(Arguments* args_ptr) {
 
-	set_cgroup();
+	set_pids_cgroup(args_ptr->max_processes);
 
 	if (unshare(CLONE_NEWNS) == -1) {
 		perror("unshare failed");

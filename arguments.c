@@ -1,16 +1,28 @@
 #include <argp.h>
-#include "args.h"
+#include <stdlib.h>
+
+#include "arguments.h"
 
 error_t parse_opt(int key, char *arg, struct argp_state *state) {
 	Arguments *args = state->input;
 
 	switch (key) {
 		case 'v':
-			args->verbose = 1;
+			args->verbose = true;
 			break;
 
 		case 'r':
 			args->filesystem_path = arg;
+			break;
+		
+		case 'p':
+			args->max_processes = arg;
+			break;
+		
+		case ARGP_KEY_INIT:
+			args->verbose = false;
+			args->filesystem_path = NULL;
+			args->max_processes = NULL; // NULL is just easier to check instead of the default 'max'
 			break;
 
 		case ARGP_KEY_ARG:

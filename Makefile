@@ -1,23 +1,21 @@
 CC := gcc
-CCARGS := -O3
-CCOBJECTS := main.o args.o container.o
+CFLAGS := -Wextra -Wall -Wpedantic -Werror -O3
 
-.SILENT: runix ${CCOBJECTS} clean 
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
 
-runix: ${CCOBJECTS}
-	${CC} ${CCARGS} ${CCOBJECTS} -o runix
+TARGET = runix
 
-main.o: main.c
-	${CC} ${CCARGS} -c main.c
+all: $(TARGET)
 
-argc.o: args.c argc.h
-	${CC} ${CCARGS} -c args.c
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
 
-container.o: container.c container.h
-	${CC} ${CCARGS} -c container.c
- 
-run: runix
-	./runix run "/bin/bash"
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+run: $(TARGET)
+	./$(TARGET) -v -r ${PWD}/ubuntu-fs run "/bin/bash"
 
 clean:
-	rm -rf runix ${CCOBJECTS}
+	rm -rf $(TARGET) $(OBJS)
