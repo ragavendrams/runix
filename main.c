@@ -16,15 +16,15 @@ const char* argp_program_bug_address = "<ragavendrams45@gmail.com>";
 const char* doc = "Runix -- a minimal linux container runtime in C";
 const char* args_doc = "run <command to run inside container>";
 struct argp_option options[] = {
-  {"verbose", 'v', 0, 0, "Produce verbose output"}, 
-  {"rootfs", 'r', "FILESYSTEM", 0, "Path to the POSIX compliant rootfs to run the container on"},
-  {"pids-limit", 'p', "MAX PROCESSES", 0, "Maximum numer of processes that can run inside the container"},{0}};
+  {"verbose", 'v', 0, 0, "Produce verbose output", 0}, 
+  {"rootfs", 'r', "FILESYSTEM", 0, "Path to the POSIX compliant rootfs to run the container on", 0},
+  {"pids-limit", 'p', "MAX PROCESSES", 0, "Maximum numer of processes that can run inside the container", 0},{0}};
 
 int main(int argc, char *argv[]) {
 
   Arguments args;
   
-  struct argp argp = {options, parse_opt, args_doc, doc};
+  struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL};
   argp_parse(&argp, argc, argv, 0, 0, &args);
 
   run(&args);
