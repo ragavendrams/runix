@@ -8,7 +8,7 @@ This repository implements a linux container runtime from scratch in C. It uses 
 
 
 ## Setup 
-- Download a POSIX compliant rootfs filesystem. Eg. To download the alpine rootfs,  
+- Download a POSIX compliant filesystem. Eg. To download the alpine filesystem,  
 ```
 	wget https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-minirootfs-3.21.3-x86_64.tar.gz
 	tar -xzf alpine-minirootfs-3.21.3-x86_64.tar.gz -C alpine-fs
@@ -34,18 +34,14 @@ This repository implements a linux container runtime from scratch in C. It uses 
 	make 
 	
 	# Start a bash shell (The shell needs to be available in the rootfs)
-	./runix run "/bin/bash"
+	./runix run --rootfs /home/ubuntu-fs "/bin/bash"
 
-	# Install packages
-	./runix run "apt install wget"
- 
 ``` 
 - If everything goes well, you should see a shell with the prompt `root@container:/#`
 
 - Type exit to end the process and return to host.  
 
 ## Limitations
-- Doesn't support pulling an image from docker-hub or other registries and starting the container using it. For now, the rootfs has to be provided to the application. 
-- No layers, caching and use of union filesystem, like in docker.
-- No way to load or save the container. Right now, if you reuse the same rootfs folder, the state of the container is persistent. Ideally, you get a new filesystem every time a new container is created. 
+- Doesn't support pulling an image from docker-hub or other registries and starting the container using it. For now, the filesystem has to be provided to the application. 
+- No way to load or save the container. Right now, if you reuse the same filesystem folder, the state of the container is persistent. Ideally, you get a new filesystem every time a new container is created. 
 - Only a few resources are limited - Currently supports limiting max processes.  
