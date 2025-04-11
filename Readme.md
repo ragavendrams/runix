@@ -11,18 +11,18 @@ This repository implements a linux container runtime from scratch in C. It uses 
 - Download a POSIX compliant filesystem. Eg. To download the alpine filesystem,  
 ```
 	wget https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-minirootfs-3.21.3-x86_64.tar.gz
-	tar -xzf alpine-minirootfs-3.21.3-x86_64.tar.gz -C alpine-fs
+	mkdir fs/alpine-fs && tar -xzf alpine-minirootfs-3.21.3-x86_64.tar.gz -C fs/alpine-fs
 ``` 
 - Get source files
 ``` 
 	git clone https://github.com/ragavendrams/runix.git
 ``` 
-- Install Make and GCC
+- Install CMake and GCC
 ``` 
-	sudo apt update && sudo apt install build-essential
+	sudo apt update && sudo apt install cmake gcc-11
 	
 	# Ensure everything is installed
-	make --version
+	cmake --version
 	gcc --version
 ``` 
 
@@ -30,11 +30,12 @@ This repository implements a linux container runtime from scratch in C. It uses 
 
 - Build the application and run it (ensure to run in a prompt with elevated privileges)
 ``` 
-	# Build the application
-	make 
+	# Configure and Build the application
+	mkdir build-release && cd build-release && cmake .. -DCMAKE_BUILD_TYPE=Release 
+	cmake --build . --target runix --parallel $(nproc)
 	
 	# Start a bash shell (The shell needs to be available in the rootfs)
-	./runix run --rootfs /home/ubuntu-fs "/bin/bash"
+	./runix run -r /home/ubuntu-fs "/bin/bash"
 
 ``` 
 - If everything goes well, you should see a shell with the prompt `root@container:/#`

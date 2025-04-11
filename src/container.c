@@ -107,7 +107,7 @@ int open_pty(int *slave_fd, char **slave_name) {
 }
 
 void run_container(Arguments* args_ptr, int slave_fd) {
-
+	// Pids cgroup is updated on the host
 	if(args_ptr->max_processes != NULL)
 		set_pids_cgroup(args_ptr->max_processes);
 	
@@ -146,6 +146,14 @@ void run_container(Arguments* args_ptr, int slave_fd) {
 		exit(1);
 	}
 	
+	// /dev/pts might not exist in a filesystem. We create it before mounting.   
+	if(mkdir("/dev/pts", 0755) == -1){
+		if (errno != EEXIST) { 
+			perror("mkdir /dev/pts failed");
+			exit(1);
+		}
+	}
+
 	if (mount("devpts", "/dev/pts", "devpts", 0, "gid=5,mode=620") == -1) {
 		perror("devpts mount failed");
 		exit(1);

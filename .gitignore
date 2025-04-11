@@ -1,5 +1,3 @@
 .vscode*
-ubuntu-fs*
-alpine-*
-*.o
-runix
+fs/*
+build-*

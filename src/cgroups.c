@@ -57,17 +57,17 @@ bool is_valid_pids_max(const char *pids_limit){
 }
 
 void set_pids_cgroup(const char *pids_limit) {
-
+	
 	if(!is_valid_pids_max(pids_limit)){
 		fprintf(stderr, "Error: Invalid value passed to --pids-limit / -p. Value must be 'max' or an unsigned integer string.");
 		exit(1);
 	}
 
-	const char *path = "/sys/fs/cgroup/runix";
+	const char *path = "/sys/fs/cgroup/pids/runix";
 	if (mkdir(path, 0755) == -1) {
 		if (errno != EEXIST) {
-		perror("mkdir failed");
-		exit(1);
+			perror("mkdir failed");
+			exit(1);
 		}
 	}
 

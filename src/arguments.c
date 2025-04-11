@@ -1,6 +1,6 @@
+#define _GNU_SOURCE
 #include <argp.h>
 #include <stdlib.h>
-
 #include "arguments.h"
 
 error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -11,8 +11,11 @@ error_t parse_opt(int key, char *arg, struct argp_state *state) {
 			args->verbose = true;
 			break;
 
-		case 'r':
-			args->filesystem_path = arg;
+		case 'r':	
+			if((args->filesystem_path = realpath(arg, NULL)) == NULL){
+				perror("Could not resolve path to filesystem");
+				exit(1);
+			}
 			break;
 		
 		case 'p':
