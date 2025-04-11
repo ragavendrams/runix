@@ -63,6 +63,7 @@ void set_pids_cgroup(const char *pids_limit) {
 		exit(1);
 	}
 
+	// Supports only Cgroups v1 for now
 	const char *path = "/sys/fs/cgroup/pids/runix";
 	if (mkdir(path, 0755) == -1) {
 		if (errno != EEXIST) {
