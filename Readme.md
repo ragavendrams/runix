@@ -1,4 +1,4 @@
-## Linux container runtime in C
+## Runix - A minimal Linux container runtime in C
 
 This repository implements a linux container runtime from scratch in C. It uses a combination of Linux features such as chroot, cgroups(v1) and namespaces. The corresponding syscalls/wrappers are called from C. The container runtime has the following features:
 - Bidirectional process isolation with host
@@ -15,7 +15,7 @@ This repository implements a linux container runtime from scratch in C. It uses 
 ``` 
 - Get source files
 ``` 
-	git clone https://github.com/ragavendrams/linux-container-from-scratch.git
+	git clone https://github.com/ragavendrams/runix.git
 ``` 
 - Install Make and GCC
 ``` 
