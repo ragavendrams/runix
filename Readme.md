@@ -63,7 +63,9 @@ root@container:/# ps -ax
   PID TTY      STAT   TIME COMMAND
     1 ?        S      0:00 /bin/bash -a
     5 ?        R+     0:00 ps -ax
-root@container:/# 
+root@container:/# exit
+exit
+(Parent) Child exited with status 0 
 
 ``` 
 - Type exit to end the process and return to host.  
