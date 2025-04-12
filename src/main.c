@@ -2,6 +2,7 @@
 
 #include "arguments.h"
 #include "container.h"
+#include "log.h"
 
 const char* argp_program_version = "Runix v1.0.0";
 const char* doc =
@@ -21,10 +22,16 @@ struct argp_option options[] = {
     {0}};
 
 int main(int argc, char* argv[]) {
+  log_set_level(LOG_TRACE);
+
   Arguments args;
 
   struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL};
   argp_parse(&argp, argc, argv, 0, 0, &args);
+
+  if (!args.verbose) {
+    log_set_level(LOG_ERROR);
+  }
 
   run(&args);
 

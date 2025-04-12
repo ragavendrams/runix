@@ -9,14 +9,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "log.h"
+
 #define MAX_CGROUP_PATH_LENGTH 256
 
 void write_resource(const char *base_path, const char *resource_name,
                     const char *resource_value) {
   int path_len = strlen(resource_name) + strlen(base_path);
   if (path_len > MAX_CGROUP_PATH_LENGTH) {
-    fprintf(stderr,
-            "Error: Path length of cgroup resource exceeded 256 characters.");
+    log_error("Error: Path length of cgroup resource exceeded 256 characters.");
   }
 
   char *full_path = malloc(path_len + 1);
@@ -28,7 +29,7 @@ void write_resource(const char *base_path, const char *resource_name,
     fclose(file);
     free(full_path);
   } else {
-    printf("Unable to write resource to disk.");
+    log_error("Unable to write resource to disk.");
     free(full_path);
     exit(1);
   }
@@ -58,9 +59,9 @@ bool is_valid_pids_max(const char *pids_limit) {
 
 void set_pids_cgroup(const char *pids_limit) {
   if (!is_valid_pids_max(pids_limit)) {
-    fprintf(stderr,
-            "Error: Invalid value passed to --pids-limit / -p. Value must be "
-            "'max' or an unsigned integer string.");
+    log_error(
+        "Error: Invalid value passed to --pids-limit / -p. Value must be "
+        "'max' or an unsigned integer string.");
     exit(1);
   }
 
@@ -68,7 +69,7 @@ void set_pids_cgroup(const char *pids_limit) {
   const char *path = "/sys/fs/cgroup/pids/runix";
   if (mkdir(path, 0755) == -1) {
     if (errno != EEXIST) {
-      perror("mkdir failed");
+      log_error("mkdir failed: %s", strerror(errno));
       exit(1);
     }
   }

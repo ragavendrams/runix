@@ -14,7 +14,7 @@ root@host:~/repos/runix$ mkdir fs/ubuntu-fs && tar -xzf ubuntu-base-22.04.5-base
 ``` 
 - Get source files
 ```console 
-root@host:~/repos/runix$ git clone https://github.com/ragavendrams/runix.git
+root@host:~/repos/runix$ git clone --recurse-submodules https://github.com/ragavendrams/runix.git
 ``` 
 - Install CMake and GCC
 ```console 
@@ -33,10 +33,11 @@ root@host:~/repos/runix$ mkdir build-release && cd build-release && cmake .. -DC
 root@host:~/repos/runix/build-release$ cmake --build . --target runix --parallel $(nproc)
 
 # Start a bash shell (The shell needs to be available in the filesystem)
-root@host:~/repos/runix/build-release$ ./runix run -r ../fs/ubuntu-fs -p 20 "/bin/bash -a"
-(Parent) Waiting.... 12441
-(Child) Starting.... 1
-root@container:/# ls -l
+root@ubuntu2204:/home/raga/repos/runix/build-release# ./runix run -r ../fs/ubuntu-fs -p 20 -v "/bin/bash"
+13:31:26 INFO  /home/raga/repos/runix/src/container.c:151: (Parent) Waiting.... 28755
+13:31:26 INFO  /home/raga/repos/runix/src/container.c:141: (Child) Starting.... 1
+11:31:26 INFO  /home/raga/repos/runix/src/container.c:144: (Child) Container initialized....
+root@container:/# ls -l 
 total 56
 lrwxrwxrwx   1 1000 1000    7 Sep 11  2024 bin -> usr/bin
 drwxr-xr-x   2 1000 1000 4096 Apr 18  2022 boot
@@ -50,7 +51,7 @@ lrwxrwxrwx   1 1000 1000   10 Sep 11  2024 libx32 -> usr/libx32
 drwxr-xr-x   2 1000 1000 4096 Sep 11  2024 media
 drwxr-xr-x   2 1000 1000 4096 Sep 11  2024 mnt
 drwxr-xr-x   2 1000 1000 4096 Sep 11  2024 opt
-dr-xr-xr-x 217 root root    0 Apr 12 09:47 proc
+dr-xr-xr-x 222 root root    0 Apr 12 11:31 proc
 drwx------   2 1000 1000 4096 Apr 11 14:09 root
 drwxr-xr-x   4 1000 1000 4096 Sep 11  2024 run
 lrwxrwxrwx   1 1000 1000    8 Sep 11  2024 sbin -> usr/sbin
@@ -61,12 +62,14 @@ drwxr-xr-x  14 1000 1000 4096 Sep 11  2024 usr
 drwxr-xr-x  11 1000 1000 4096 Sep 11  2024 var
 root@container:/# ps -ax
   PID TTY      STAT   TIME COMMAND
-    1 ?        S      0:00 /bin/bash -a
+    1 ?        S      0:00 /bin/bash
     5 ?        R+     0:00 ps -ax
+root@container:/# echo "container"
+container
 root@container:/# exit
 exit
-(Parent) Child exited with status 0 
-
+13:32:18 INFO  /home/raga/repos/runix/src/container.c:156: (Parent) Child exited with status 0
+root@ubuntu2204:/home/raga/repos/runix/build-release# 
 ``` 
 - Type exit to end the process and return to host.  
 

@@ -3,6 +3,9 @@
 
 #include <argp.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "log.h"
 
 error_t parse_opt(int key, char *arg, struct argp_state *state) {
   Arguments *args = state->input;
@@ -14,7 +17,7 @@ error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
     case 'r':
       if ((args->filesystem_path = realpath(arg, NULL)) == NULL) {
-        perror("Could not resolve path to filesystem");
+        log_error("Could not resolve path to filesystem: %s", strerror(errno));
         exit(1);
       }
       break;
@@ -32,7 +35,7 @@ error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
     case ARGP_KEY_ARG:
       if (state->arg_num > 2) {
-        fprintf(stderr, "Error: Too many arguments %d.\n", state->arg_num);
+        log_error("Error: Too many arguments %d.\n", state->arg_num);
         argp_usage(state);
       }
       args->args[state->arg_num] = arg;
@@ -40,15 +43,15 @@ error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
     case ARGP_KEY_END:
       if (state->arg_num < 2) {
-        fprintf(stderr, "Error: Not enough arguments.\n");
+        log_error("Error: Not enough arguments.\n");
         argp_usage(state);
       }
 
       // Check if the mandatory argument was provided
       if (args->filesystem_path == NULL) {
-        fprintf(stderr,
-                "Error: Missing mandatory argument for filesystem. Pass the "
-                "rootfs filesystem using -r or --rootfs\n");
+        log_error(
+            "Error: Missing mandatory argument for filesystem. Pass the "
+            "rootfs filesystem using -r or --rootfs\n");
         argp_usage(state);  // Exit with usage message
       }
       break;

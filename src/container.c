@@ -19,14 +19,22 @@
 
 #include "arguments.h"
 #include "cgroups.h"
+#include "log.h"
 
-#define BUFFER_SIZE 1024
+void free_tokens(char** tokens, int num_tokens) {
+  if (tokens == NULL) return;
+
+  for (int i = 0; i < num_tokens; i++) {
+    free(tokens[i]);
+  }
+  free(tokens);
+}
 
 char** split_string(const char* input, const char* delimiter, int* count) {
   // Create duplicate string
   char* temp_string = strdup(input);
   if (!temp_string) {
-    perror("Failed to allocate memory");
+    log_error("Failed to allocate memory: %s", strerror(errno));
     exit(1);
   }
 
@@ -43,14 +51,14 @@ char** split_string(const char* input, const char* delimiter, int* count) {
   // Allocate memory for the array of tokens
   char** tokens = malloc(sizeof(char*) * (num_tokens + 1));
   if (!tokens) {
-    perror("Failed to allocate memory");
+    log_error("Failed to allocate memory: %s", strerror(errno));
     exit(1);
   }
 
   temp_string = strdup(input);
   if (!temp_string) {
-    perror("Failed to allocate memory");
-    free(tokens);
+    log_error("Failed to allocate memory: %s", strerror(errno));
+    free_tokens(tokens, num_tokens);
     exit(1);
   }
 
@@ -67,92 +75,91 @@ char** split_string(const char* input, const char* delimiter, int* count) {
   return tokens;
 }
 
-void free_tokens(char** tokens, int num_tokens) {
-  if (tokens == NULL) return;
-
-  for (int i = 0; i < num_tokens; i++) {
-    free(tokens[i]);
-  }
-  free(tokens);
-}
-
-void run_container(Arguments* args_ptr) {
+void setup_container(Arguments* args_ptr) {
   // Pids cgroup is updated on the host
   if (args_ptr->max_processes != NULL) set_pids_cgroup(args_ptr->max_processes);
 
   if (unshare(CLONE_NEWNS) == -1) {
-    perror("unshare failed");
+    log_error("unshare failed: %s", strerror(errno));
     exit(1);
   }
 
   if (chdir("/home") == -1) {
-    perror("chdir failed");
+    log_error("chdir failed: %s", strerror(errno));
     exit(1);
   }
 
   if (sethostname("container", sizeof("container")) == -1) {
-    perror("sethostname failed");
+    log_error("sethostname failed: %s", strerror(errno));
     exit(1);
   }
 
   if (chroot(args_ptr->filesystem_path) == -1) {
-    perror("chroot failed");
+    log_error("chroot failed: %s", strerror(errno));
     exit(1);
   }
 
   if (chdir("/") == -1) {
-    perror("chdir failed");
+    log_error("chdir failed: %s", strerror(errno));
     exit(1);
   }
 
   if (mount("proc", "proc", "proc", 0, NULL) == -1) {
-    perror("proc mount failed");
+    log_error("proc mount failed: %s", strerror(errno));
     exit(1);
   }
+}
 
+void run_container(Arguments* args_ptr) {
   int num_tokens = 0;
   char** tokens = split_string(args_ptr->args[1], " ", &num_tokens);
 
   if (execv(tokens[0], tokens) == -1) {
-    perror("(Child) execv failed");
+    log_error("(Child) execv failed: %s", strerror(errno));
     free_tokens(tokens, num_tokens);
     exit(1);
   }
 
   free_tokens(tokens, num_tokens);
 
-  printf("(Child) PID %d finished executing command.\n", getpid());
-
   if (umount("proc") == -1) {
-    perror("unmount failed");
+    log_error("unmount failed: %s", strerror(errno));
     exit(1);
   }
 
-  exit(0);
+  return;
 }
 
 void run(Arguments* args_ptr) {
-  struct clone_args clargs = {0};
-  clargs.flags = CLONE_NEWUTS | CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWCGROUP;
-  clargs.exit_signal = SIGCHLD;
+  struct clone_args cl_args = {0};
+  cl_args.flags = CLONE_NEWUTS | CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWCGROUP;
+  cl_args.exit_signal = SIGCHLD;
 
-  pid_t pid = syscall(SYS_clone3, &clargs, sizeof(struct clone_args));
+  pid_t pid = syscall(SYS_clone3, &cl_args, sizeof(struct clone_args));
 
   if (pid == 0) {
-    printf("(Child) Starting.... %d\n", getpid());
+    log_info("(Child) Starting.... %d", getpid());
+
+    setup_container(args_ptr);
+    log_info("(Child) Container initialized....");
+
     run_container(args_ptr);
+    log_info("(Child) PID %d finished executing command. Exiting...", getpid());
+
+    exit(0);
   } else if (pid > 0) {
-    printf("(Parent) Waiting.... %d\n", getpid());
+    log_info("(Parent) Waiting.... %d", getpid());
 
     int status;
     waitpid(pid, &status, 0);
     if (WIFEXITED(status)) {
-      printf("(Parent) Child exited with status %d\n", WEXITSTATUS(status));
+      log_info("(Parent) Child exited with status %d", WEXITSTATUS(status));
     }
     exit(0);
   } else {
     // Negative pid (-1) means child was not created
-    perror("(Parent) Could not create child. Reason: ");
+    log_error("(Parent) Could not create child : %s. Are you root?",
+              strerror(errno));
     exit(-1);
   }
 }
