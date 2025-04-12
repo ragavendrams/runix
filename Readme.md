@@ -9,31 +9,31 @@ This implementation uses a combination of features such as chroot, cgroups(v1) a
 ## Setup 
 - Download a POSIX compliant root filesystem. Eg. To download a minimal root filesystem for Ubuntu 22.04,  
 ```console
-$ wget https://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/ubuntu-base-22.04.5-base-amd64.tar.gz
-$ mkdir fs/ubuntu-fs && tar -xzf ubuntu-base-22.04.5-base-amd64.tar.gz -C fs/ubuntu-fs
+root@host:~/repos/runix$ wget https://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/ubuntu-base-22.04.5-base-amd64.tar.gz
+root@host:~/repos/runix$ mkdir fs/ubuntu-fs && tar -xzf ubuntu-base-22.04.5-base-amd64.tar.gz -C fs/ubuntu-fs
 ``` 
 - Get source files
 ```console 
-$ git clone https://github.com/ragavendrams/runix.git
+root@host:~/repos/runix$ git clone https://github.com/ragavendrams/runix.git
 ``` 
 - Install CMake and GCC
 ```console 
-$ sudo apt update && sudo apt install cmake gcc-11
+root@host:~/repos/runix$ sudo apt update && sudo apt install cmake gcc-11
 
 # Ensure everything is installed
-$ cmake --version
-$ gcc --version
+root@host:~/repos/runix$ cmake --version
+root@host:~/repos/runix$ gcc --version
 ``` 
 
 ## Running the container
 
 - Build the application and run it (ensure to run in a prompt with elevated privileges)
 ```console 
-root@host:/home/raga/repos/runix$ mkdir build-release && cd build-release && cmake .. -DCMAKE_BUILD_TYPE=Release 
-root@host:/home/raga/repos/runix/build-release$ cmake --build . --target runix --parallel $(nproc)
+root@host:~/repos/runix$ mkdir build-release && cd build-release && cmake .. -DCMAKE_BUILD_TYPE=Release 
+root@host:~/repos/runix/build-release$ cmake --build . --target runix --parallel $(nproc)
 
 # Start a bash shell (The shell needs to be available in the filesystem)
-root@host:/home/raga/repos/runix/build-release$ ./runix run -r ../fs/ubuntu-fs -p 20 "/bin/bash -a"
+root@host:~/repos/runix/build-release$ ./runix run -r ../fs/ubuntu-fs -p 20 "/bin/bash -a"
 (Parent) Waiting.... 12441
 (Child) Starting.... 1
 root@container:/# ls -l
@@ -73,4 +73,5 @@ exit
 ## Limitations
 - Doesn't support pull/push of images. For now, the filesystem has to be provided to the application. 
 - Currently only supports limiting max processes allowed within the container. Other cgroup controllers could also be used in the future. 
-- Container process is in the host's process group. Ideally the container process has its own process group and its own controlling terminal.  
+- Container process is in the host's process group. Ideally the container process has its own process group and its own controlling terminal.
+- User needs to be root to run the container. Rootless containers could be added in the future by using user namespaces.  
