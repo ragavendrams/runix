@@ -71,7 +71,6 @@ exit
 13:32:18 INFO  /home/raga/repos/runix/src/container.c:156: (Parent) Child exited with status 0
 root@ubuntu2204:/home/raga/repos/runix/build-release# 
 ``` 
-- Type exit to end the process and return to host.  
 
 ## Limitations
 - Doesn't support pull/push of images. For now, the filesystem has to be provided to the application. 
