@@ -29,11 +29,11 @@ $ gcc --version
 
 - Build the application and run it (ensure to run in a prompt with elevated privileges)
 ```console 
-$ mkdir build-release && cd build-release && cmake .. -DCMAKE_BUILD_TYPE=Release 
-$ cmake --build . --target runix --parallel $(nproc)
+root@host:/home/raga/repos/runix$ mkdir build-release && cd build-release && cmake .. -DCMAKE_BUILD_TYPE=Release 
+root@host:/home/raga/repos/runix/build-release$ cmake --build . --target runix --parallel $(nproc)
 
 # Start a bash shell (The shell needs to be available in the filesystem)
-$ ./runix run -r ../fs/ubuntu-fs -p 20 "/bin/bash -a"
+root@host:/home/raga/repos/runix/build-release$ ./runix run -r ../fs/ubuntu-fs -p 20 "/bin/bash -a"
 (Parent) Waiting.... 12441
 (Child) Starting.... 1
 root@container:/# ls -l
