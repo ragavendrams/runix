@@ -130,7 +130,7 @@ void run_container(Arguments* args_ptr) {
   return;
 }
 
-void run(Arguments* args_ptr) {
+int run(Arguments* args_ptr) {
   struct clone_args cl_args = {0};
   cl_args.flags = CLONE_NEWUTS | CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWCGROUP;
   cl_args.exit_signal = SIGCHLD;
@@ -155,11 +155,11 @@ void run(Arguments* args_ptr) {
     if (WIFEXITED(status)) {
       log_info("(Parent) Child exited with status %d", WEXITSTATUS(status));
     }
-    exit(0);
+    return 0;
   } else {
     // Negative pid (-1) means child was not created
     log_error("(Parent) Could not create child : %s. Are you root?",
               strerror(errno));
-    exit(-1);
+    return -1;
   }
 }

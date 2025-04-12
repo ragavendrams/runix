@@ -1,4 +1,5 @@
 #include <argp.h>
+#include <stdlib.h>
 
 #include "arguments.h"
 #include "container.h"
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
     log_set_level(LOG_ERROR);
   }
 
-  run(&args);
-
-  return 0;
+  int status = run(&args);
+  free(args.filesystem_path);
+  return status;
 }
